@@ -75,207 +75,374 @@ $voci = $connessione->query(
 <html lang="it">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta charset="UTF-8">
+    <title>Template bilancio</title>
 
-<title>Template bilancio</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
 
-<style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #eef2ed;
+            color: #2f332f;
+        }
 
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f6f5;
-    margin: 0;
-    padding: 40px 20px;
-}
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
 
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-}
+        .sidebar {
+            width: 240px;
+            background: #9caf98;
+            padding: 35px 0 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
 
-.box {
-    background: white;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    margin-bottom: 25px;
-}
+        .logo {
+            padding: 0 28px 35px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #263127;
+        }
 
-h1 {
-    color: #333;
-}
+        .menu {
+            display: flex;
+            flex-direction: column;
+        }
 
-.voce {
-    padding: 15px 0;
-    border-bottom: 1px solid #eee;
-}
+        .menu a {
+            text-decoration: none;
+            color: #303830;
+            padding: 16px 28px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 15px;
+            transition: 0.2s;
+        }
 
-.voce:last-child {
-    border-bottom: none;
-}
+        .menu a:hover,
+        .menu a.active {
+            background: rgba(255, 255, 255, 0.22);
+            border-left: 4px solid #c9a64b;
+            padding-left: 24px;
+        }
 
-.voce h3 {
-    margin: 0 0 5px 0;
-}
+        .logout-area a {
+            text-decoration: none;
+            color: #303830;
+            padding: 16px 28px;
+            display: block;
+        }
 
-.descrizione {
-    color: #666;
-}
+        .logout-area a:hover {
+            background: rgba(255, 255, 255, 0.22);
+        }
 
-label {
-    display: block;
-    font-weight: bold;
-    margin-top: 15px;
-    margin-bottom: 6px;
-}
+        .main {
+            flex: 1;
+            padding: 30px 35px;
+        }
 
-input,
-textarea {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 11px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 15px;
-}
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
 
-textarea {
-    min-height: 100px;
-    resize: vertical;
-}
+        .topbar h1 {
+            margin: 0;
+            font-size: 30px;
+        }
 
-button {
-    width: 100%;
-    margin-top: 20px;
-    padding: 12px;
-    border: none;
-    border-radius: 6px;
-    background-color: #35b98a;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-}
+        .back-link {
+            text-decoration: none;
+            color: #536354;
+            font-weight: 600;
+        }
 
-button:hover {
-    background-color: #2da77b;
-}
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 22px;
+            align-items: start;
+        }
 
-.messaggio {
-    font-weight: bold;
-    margin-bottom: 20px;
-}
+        .panel {
+            background: #f7f9f5;
+            border-radius: 18px;
+            padding: 25px;
+            border: 1px solid #dfe6dc;
+            box-shadow: 0 5px 18px rgba(0,0,0,0.05);
+        }
 
-.indietro {
-    display: block;
-    text-align: center;
-    color: #35a77e;
-    text-decoration: none;
-    margin-top: 20px;
-}
+        .panel h2 {
+            margin-top: 0;
+            font-size: 21px;
+        }
 
-</style>
+        .voce {
+            background: #e3e9e0;
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 14px;
+        }
 
+        .voce:last-child {
+            margin-bottom: 0;
+        }
+
+        .voce h3 {
+            margin: 0 0 8px;
+            font-size: 17px;
+        }
+
+        .descrizione {
+            color: #5f685f;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-top: 15px;
+            margin-bottom: 6px;
+            color: #424b42;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px 13px;
+            border: 1px solid #ccd5c8;
+            border-radius: 10px;
+            font-size: 14px;
+            background: white;
+            outline: none;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: #9caf98;
+            box-shadow: 0 0 0 3px rgba(156,175,152,0.16);
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 22px;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: #9caf98;
+            color: #263127;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #899e86;
+            transform: translateY(-1px);
+        }
+
+        .messaggio {
+            background: #e2eadf;
+            border-left: 4px solid #a88b3f;
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .empty {
+            color: #6b746b;
+        }
+
+        @media (max-width: 950px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .sidebar {
+                width: 190px;
+            }
+
+            .main {
+                padding: 20px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="layout">
 
-    <h1>Template bilancio</h1>
+    <aside class="sidebar">
 
-    <div class="box">
+        <div>
 
-        <h2>Voci contabili</h2>
+            <div class="logo">
+                ESG Balance
+            </div>
 
-        <?php if ($voci && $voci->num_rows > 0): ?>
+            <nav class="menu">
 
-            <?php while ($voce = $voci->fetch_assoc()): ?>
+                <a href="dashboard_admin.php">
+                    🏠 Dashboard
+                </a>
 
-                <div class="voce">
+                <a href="indicatori.php">
+                    🌱 Indicatori ESG
+                </a>
 
-                    <h3>
-                        <?php echo htmlspecialchars($voce["nome"]); ?>
-                    </h3>
+                <a href="template.php" class="active">
+                    📄 Template bilancio
+                </a>
 
-                    <div class="descrizione">
+                <a href="assegna_revisore.php">
+                    👥 Assegna revisore
+                </a>
 
-                        <?php
-                        echo !empty($voce["descrizione"])
-                            ? htmlspecialchars($voce["descrizione"])
-                            : "Nessuna descrizione";
-                        ?>
+                <a href="../statistiche.php">
+                    📊 Statistiche
+                </a>
 
+            </nav>
+
+        </div>
+
+        <div class="logout-area">
+            <a href="../logout.php">
+                ↪ Logout
+            </a>
+        </div>
+
+    </aside>
+
+
+    <main class="main">
+
+        <div class="topbar">
+
+            <h1>Template bilancio</h1>
+
+            <a class="back-link" href="dashboard_admin.php">
+                ← Dashboard
+            </a>
+
+        </div>
+
+
+        <div class="content-grid">
+
+            <div class="panel">
+
+                <h2>Voci contabili</h2>
+
+                <?php if ($voci && $voci->num_rows > 0): ?>
+
+                    <?php while ($voce = $voci->fetch_assoc()): ?>
+
+                        <div class="voce">
+
+                            <h3>
+                                <?php echo htmlspecialchars($voce["nome"]); ?>
+                            </h3>
+
+                            <div class="descrizione">
+
+                                <?php
+                                echo !empty($voce["descrizione"])
+                                    ? htmlspecialchars($voce["descrizione"])
+                                    : "Nessuna descrizione";
+                                ?>
+
+                            </div>
+
+                        </div>
+
+                    <?php endwhile; ?>
+
+                <?php else: ?>
+
+                    <p class="empty">
+                        Nessuna voce presente nel template.
+                    </p>
+
+                <?php endif; ?>
+
+            </div>
+
+
+            <div class="panel">
+
+                <h2>Aggiungi nuova voce</h2>
+
+                <?php if ($messaggio !== ""): ?>
+
+                    <div class="messaggio">
+                        <?php echo htmlspecialchars($messaggio); ?>
                     </div>
 
-                </div>
+                <?php endif; ?>
 
-            <?php endwhile; ?>
+                <form method="post">
 
-        <?php else: ?>
+                    <label for="nome">
+                        Nome voce
+                    </label>
 
-            <p>Nessuna voce presente nel template.</p>
-
-        <?php endif; ?>
-
-    </div>
-
-
-    <div class="box">
-
-        <h2>Aggiungi nuova voce</h2>
-
-        <?php if ($messaggio !== ""): ?>
-
-            <p class="messaggio">
-                <?php echo htmlspecialchars($messaggio); ?>
-            </p>
-
-        <?php endif; ?>
-
-        <form method="post">
-
-            <label for="nome">
-                Nome voce
-            </label>
-
-            <input
-                type="text"
-                name="nome"
-                id="nome"
-                required
-            >
+                    <input
+                        type="text"
+                        name="nome"
+                        id="nome"
+                        required
+                    >
 
 
-            <label for="descrizione">
-                Descrizione
-            </label>
+                    <label for="descrizione">
+                        Descrizione
+                    </label>
 
-            <textarea
-                name="descrizione"
-                id="descrizione"
-                placeholder="Descrizione della voce contabile..."
-            ></textarea>
-
-
-            <button type="submit">
-                Aggiungi voce
-            </button>
-
-        </form>
-
-    </div>
+                    <textarea
+                        name="descrizione"
+                        id="descrizione"
+                        placeholder="Descrizione della voce contabile..."
+                    ></textarea>
 
 
-    <a
-        class="indietro"
-        href="dashboard_admin.php"
-    >
-        Torna alla dashboard
-    </a>
+                    <button type="submit">
+                        Aggiungi voce
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </main>
 
 </div>
 
 </body>
-
 </html>

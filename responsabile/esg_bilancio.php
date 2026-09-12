@@ -159,293 +159,691 @@ $valori_esg = $stmt->get_result();
 
 <head>
 
-<meta charset="UTF-8">
-<title>Valori ESG</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
+    <title>Valori ESG</title>
 
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f6f5;
-    margin: 0;
-    padding: 40px 20px;
-}
+    <style>
 
-.container {
-    max-width: 850px;
-    margin: 0 auto;
-}
+        * {
+            box-sizing: border-box;
+        }
 
-.box {
-    background: white;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    margin-bottom: 25px;
-}
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #eef2ed;
+            color: #2f332f;
+        }
 
-h1,
-h2 {
-    color: #333;
-}
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
 
-label {
-    display: block;
-    font-weight: bold;
-    margin-top: 15px;
-    margin-bottom: 6px;
-}
+        .sidebar {
+            width: 240px;
+            background: #9caf98;
+            padding: 35px 0 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
 
-input,
-select {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 11px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 15px;
-}
+        .logo {
+            padding: 0 28px 35px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #263127;
+        }
 
-button {
-    width: 100%;
-    margin-top: 20px;
-    padding: 12px;
-    border: none;
-    border-radius: 6px;
-    background-color: #35b98a;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-}
+        .menu {
+            display: flex;
+            flex-direction: column;
+        }
 
-button:hover {
-    background-color: #2da77b;
-}
+        .menu a {
+            text-decoration: none;
+            color: #303830;
+            padding: 16px 28px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 15px;
+            transition: 0.2s;
+        }
 
-.valore {
-    padding: 15px 0;
-    border-bottom: 1px solid #eee;
-}
+        .menu a:hover,
+        .menu a.active {
+            background: rgba(255,255,255,0.22);
+            border-left: 4px solid #c9a64b;
+            padding-left: 24px;
+        }
 
-.valore:last-child {
-    border-bottom: none;
-}
+        .logout-area a {
+            text-decoration: none;
+            color: #303830;
+            padding: 16px 28px;
+            display: block;
+        }
 
-.messaggio {
-    font-weight: bold;
-    margin-bottom: 20px;
-}
+        .logout-area a:hover {
+            background: rgba(255,255,255,0.22);
+        }
 
-.indietro {
-    display: block;
-    text-align: center;
-    margin-top: 20px;
-    color: #35a77e;
-    text-decoration: none;
-}
+        .main {
+            flex: 1;
+            padding: 30px 35px;
+        }
 
-</style>
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .topbar h1 {
+            margin: 0;
+            font-size: 30px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: #536354;
+            font-weight: 600;
+        }
+
+        .summary {
+            background: #dfe7df;
+            border-radius: 18px;
+            padding: 22px 25px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .summary h2 {
+            margin: 0 0 7px;
+            font-size: 21px;
+        }
+
+        .summary p {
+            margin: 0;
+            color: #5e675e;
+        }
+
+        .stato {
+            display: inline-block;
+            padding: 7px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .stato-bozza {
+            background: #e5e5e5;
+            color: #606060;
+        }
+
+        .stato-revisione {
+            background: #eee3bf;
+            color: #796529;
+        }
+
+        .stato-approvato {
+            background: #d8e7d5;
+            color: #496548;
+        }
+
+        .stato-respinto {
+            background: #edd8d5;
+            color: #804c46;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 0.9fr 1.1fr;
+            gap: 22px;
+            align-items: start;
+        }
+
+        .panel {
+            background: #f7f9f5;
+            border-radius: 18px;
+            padding: 26px;
+            border: 1px solid #dfe6dc;
+            box-shadow: 0 5px 18px rgba(0,0,0,0.05);
+        }
+
+        .panel h2 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 21px;
+        }
+
+        .panel-description {
+            margin-top: 0;
+            margin-bottom: 22px;
+            color: #6b746b;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #424b42;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid #ccd5c8;
+            border-radius: 10px;
+            font-size: 14px;
+            background: white;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #9caf98;
+            box-shadow: 0 0 0 3px rgba(156,175,152,0.16);
+        }
+
+        button {
+            width: 100%;
+            margin-top: 22px;
+            padding: 13px;
+            border: none;
+            border-radius: 10px;
+            background: #c9a64b;
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #b4923e;
+            transform: translateY(-1px);
+        }
+
+        .messaggio {
+            background: #e2eadf;
+            border-left: 4px solid #a88b3f;
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-weight: 600;
+            margin-bottom: 18px;
+        }
+
+        .valore {
+            background: white;
+            border: 1px solid #e0e6dd;
+            border-radius: 13px;
+            padding: 17px;
+            margin-bottom: 13px;
+        }
+
+        .valore:last-child {
+            margin-bottom: 0;
+        }
+
+        .valore-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .valore h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .tipo {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            background: #dfe7df;
+            color: #546454;
+        }
+
+        .valore-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .info-item {
+            background: #f6f8f4;
+            border-radius: 9px;
+            padding: 10px;
+        }
+
+        .info-label {
+            display: block;
+            color: #818981;
+            font-size: 11px;
+            margin-bottom: 3px;
+        }
+
+        .info-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: #414941;
+            word-break: break-word;
+        }
+
+        .empty {
+            background: #f1f4ef;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            color: #6c756c;
+        }
+
+        @media (max-width: 1000px) {
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        @media (max-width: 700px) {
+
+            .sidebar {
+                width: 190px;
+            }
+
+            .main {
+                padding: 20px;
+            }
+
+            .topbar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .valore-info {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
 
 </head>
 
 <body>
 
-<div class="container">
+<?php
 
-    <div class="box">
+$classe_stato = "stato-bozza";
 
-        <h1>
-            Valori ESG - Bilancio #<?php echo $bilancio["id_bilancio"]; ?>
-        </h1>
+if ($bilancio["stato"] === "in revisione") {
 
-        <p>
-            <strong>Azienda:</strong>
-            <?php echo htmlspecialchars($bilancio["nome_azienda"]); ?>
-        </p>
+    $classe_stato = "stato-revisione";
 
-        <p>
-            <strong>Stato:</strong>
-            <?php echo htmlspecialchars($bilancio["stato"]); ?>
-        </p>
+} elseif ($bilancio["stato"] === "approvato") {
 
-    </div>
+    $classe_stato = "stato-approvato";
+
+} elseif ($bilancio["stato"] === "respinto") {
+
+    $classe_stato = "stato-respinto";
+}
+
+?>
+
+<div class="layout">
+
+    <aside class="sidebar">
+
+        <div>
+
+            <div class="logo">
+                ESG Balance
+            </div>
+
+            <nav class="menu">
+
+                <a href="dashboard_responsabile.php">
+                    🏠 Dashboard
+                </a>
+
+                <a href="aziende.php">
+                    🏢 Le mie aziende
+                </a>
+
+                <a href="registra_azienda.php">
+                    ＋ Registra azienda
+                </a>
+
+                <a href="bilanci.php" class="active">
+                    📄 Bilanci
+                </a>
+
+                <a href="../statistiche.php">
+                    📊 Statistiche
+                </a>
+
+            </nav>
+
+        </div>
+
+        <div class="logout-area">
+
+            <a href="../logout.php">
+                ↪ Logout
+            </a>
+
+        </div>
+
+    </aside>
 
 
-    <div class="box">
+    <main class="main">
 
-        <h2>Aggiungi valore ESG</h2>
+        <div class="topbar">
 
-        <?php if ($messaggio !== ""): ?>
+            <h1>Valori ESG</h1>
 
-            <p class="messaggio">
-                <?php echo htmlspecialchars($messaggio); ?>
-            </p>
-
-        <?php endif; ?>
-
-        <form method="post">
-
-            <label for="id_voce">
-                Voce contabile
-            </label>
-
-            <select
-                name="id_voce"
-                id="id_voce"
-                required
+            <a
+                class="back-link"
+                href="compila_bilancio.php?id=<?php echo $bilancio["id_bilancio"]; ?>"
             >
+                ← Torna al bilancio
+            </a>
 
-                <option value="">
-                    Seleziona una voce
-                </option>
-
-                <?php while ($voce = $voci->fetch_assoc()): ?>
-
-                    <option value="<?php echo $voce["id_voce"]; ?>">
-                        <?php echo htmlspecialchars($voce["nome"]); ?>
-                    </option>
-
-                <?php endwhile; ?>
-
-            </select>
+        </div>
 
 
-            <label for="id_indicatore">
-                Indicatore ESG
-            </label>
+        <div class="summary">
 
-            <select
-                name="id_indicatore"
-                id="id_indicatore"
-                required
-            >
+            <div>
 
-                <option value="">
-                    Seleziona un indicatore
-                </option>
+                <h2>
+                    Bilancio #<?php echo $bilancio["id_bilancio"]; ?>
+                </h2>
 
-                <?php while ($indicatore = $indicatori->fetch_assoc()): ?>
+                <p>
+                    <?php echo htmlspecialchars($bilancio["nome_azienda"]); ?>
+                </p>
 
-                    <option value="<?php echo $indicatore["id_indicatore"]; ?>">
-                        <?php
-                        echo htmlspecialchars($indicatore["nome"]);
-                        echo " (" .
-                            htmlspecialchars($indicatore["tipo"]) .
-                            ")";
-                        ?>
-                    </option>
+            </div>
 
-                <?php endwhile; ?>
+            <span class="stato <?php echo $classe_stato; ?>">
+                <?php echo htmlspecialchars(
+                    ucfirst($bilancio["stato"])
+                ); ?>
+            </span>
 
-            </select>
+        </div>
 
 
-            <label for="valore_numerico">
-                Valore numerico
-            </label>
+        <div class="content-grid">
 
-            <input
-                type="number"
-                step="0.01"
-                name="valore_numerico"
-                id="valore_numerico"
-                required
-            >
+            <div class="panel">
 
+                <h2>Aggiungi valore ESG</h2>
 
-            <label for="fonte">
-                Fonte
-            </label>
-
-            <input
-                type="text"
-                name="fonte"
-                id="fonte"
-                placeholder="es. bolletta energia"
-                required
-            >
+                <p class="panel-description">
+                    Associa un indicatore ESG a una voce contabile
+                    del bilancio e inserisci il relativo valore.
+                </p>
 
 
-            <label for="data_rilevazione">
-                Data rilevazione
-            </label>
+                <?php if ($messaggio !== ""): ?>
 
-            <input
-                type="date"
-                name="data_rilevazione"
-                id="data_rilevazione"
-                required
-            >
+                    <div class="messaggio">
+                        <?php echo htmlspecialchars($messaggio); ?>
+                    </div>
+
+                <?php endif; ?>
 
 
-            <button type="submit">
-                Salva valore ESG
-            </button>
+                <form method="post">
 
-        </form>
+                    <label for="id_voce">
+                        Voce contabile
+                    </label>
 
-    </div>
+                    <select
+                        name="id_voce"
+                        id="id_voce"
+                        required
+                    >
 
+                        <option value="">
+                            Seleziona una voce
+                        </option>
 
-    <div class="box">
+                        <?php while ($voce = $voci->fetch_assoc()): ?>
 
-        <h2>Valori ESG inseriti</h2>
+                            <option value="<?php echo $voce["id_voce"]; ?>">
+                                <?php echo htmlspecialchars($voce["nome"]); ?>
+                            </option>
 
-        <?php if ($valori_esg->num_rows > 0): ?>
+                        <?php endwhile; ?>
 
-            <?php while ($valore = $valori_esg->fetch_assoc()): ?>
-
-                <div class="valore">
-
-                    <p>
-                        <strong>Voce:</strong>
-                        <?php echo htmlspecialchars($valore["nome_voce"]); ?>
-                    </p>
-
-                    <p>
-                        <strong>Indicatore:</strong>
-                        <?php echo htmlspecialchars($valore["nome_indicatore"]); ?>
-                        (<?php echo htmlspecialchars($valore["tipo"]); ?>)
-                    </p>
-
-                    <p>
-                        <strong>Valore:</strong>
-                        <?php echo htmlspecialchars($valore["valore_numerico"]); ?>
-                    </p>
-
-                    <p>
-                        <strong>Fonte:</strong>
-                        <?php echo htmlspecialchars($valore["fonte"]); ?>
-                    </p>
-
-                    <p>
-                        <strong>Data rilevazione:</strong>
-                        <?php echo htmlspecialchars($valore["data_rilevazione"]); ?>
-                    </p>
-
-                </div>
-
-            <?php endwhile; ?>
-
-        <?php else: ?>
-
-            <p>
-                Non sono ancora presenti valori ESG per questo bilancio.
-            </p>
-
-        <?php endif; ?>
-
-    </div>
+                    </select>
 
 
-    <a
-        class="indietro"
-        href="compila_bilancio.php?id=<?php echo $bilancio["id_bilancio"]; ?>"
-    >
-        Torna al bilancio
-    </a>
+                    <label for="id_indicatore">
+                        Indicatore ESG
+                    </label>
+
+                    <select
+                        name="id_indicatore"
+                        id="id_indicatore"
+                        required
+                    >
+
+                        <option value="">
+                            Seleziona un indicatore
+                        </option>
+
+                        <?php while ($indicatore = $indicatori->fetch_assoc()): ?>
+
+                            <option value="<?php echo $indicatore["id_indicatore"]; ?>">
+                                <?php
+                                echo htmlspecialchars($indicatore["nome"]);
+                                echo " (" .
+                                    htmlspecialchars($indicatore["tipo"]) .
+                                    ")";
+                                ?>
+                            </option>
+
+                        <?php endwhile; ?>
+
+                    </select>
+
+
+                    <label for="valore_numerico">
+                        Valore numerico
+                    </label>
+
+                    <input
+                        type="number"
+                        step="0.01"
+                        name="valore_numerico"
+                        id="valore_numerico"
+                        placeholder="Inserisci il valore"
+                        required
+                    >
+
+
+                    <label for="fonte">
+                        Fonte
+                    </label>
+
+                    <input
+                        type="text"
+                        name="fonte"
+                        id="fonte"
+                        placeholder="es. bolletta energia"
+                        required
+                    >
+
+
+                    <label for="data_rilevazione">
+                        Data rilevazione
+                    </label>
+
+                    <input
+                        type="date"
+                        name="data_rilevazione"
+                        id="data_rilevazione"
+                        required
+                    >
+
+
+                    <button type="submit">
+                        Salva valore ESG
+                    </button>
+
+                </form>
+
+            </div>
+
+
+            <div class="panel">
+
+                <h2>Valori ESG inseriti</h2>
+
+                <p class="panel-description">
+                    Qui trovi tutti gli indicatori ESG già associati
+                    alle voci contabili di questo bilancio.
+                </p>
+
+
+                <?php if ($valori_esg->num_rows > 0): ?>
+
+                    <?php while ($valore = $valori_esg->fetch_assoc()): ?>
+
+                        <div class="valore">
+
+                            <div class="valore-header">
+
+                                <div>
+
+                                    <h3>
+                                        <?php echo htmlspecialchars(
+                                            $valore["nome_indicatore"]
+                                        ); ?>
+                                    </h3>
+
+                                </div>
+
+
+                                <span class="tipo">
+                                    <?php echo htmlspecialchars(
+                                        ucfirst($valore["tipo"])
+                                    ); ?>
+                                </span>
+
+                            </div>
+
+
+                            <div class="valore-info">
+
+                                <div class="info-item">
+
+                                    <span class="info-label">
+                                        Voce contabile
+                                    </span>
+
+                                    <span class="info-value">
+                                        <?php echo htmlspecialchars(
+                                            $valore["nome_voce"]
+                                        ); ?>
+                                    </span>
+
+                                </div>
+
+
+                                <div class="info-item">
+
+                                    <span class="info-label">
+                                        Valore
+                                    </span>
+
+                                    <span class="info-value">
+                                        <?php echo htmlspecialchars(
+                                            $valore["valore_numerico"]
+                                        ); ?>
+                                    </span>
+
+                                </div>
+
+
+                                <div class="info-item">
+
+                                    <span class="info-label">
+                                        Fonte
+                                    </span>
+
+                                    <span class="info-value">
+                                        <?php echo htmlspecialchars(
+                                            $valore["fonte"]
+                                        ); ?>
+                                    </span>
+
+                                </div>
+
+
+                                <div class="info-item">
+
+                                    <span class="info-label">
+                                        Data rilevazione
+                                    </span>
+
+                                    <span class="info-value">
+                                        <?php echo htmlspecialchars(
+                                            $valore["data_rilevazione"]
+                                        ); ?>
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    <?php endwhile; ?>
+
+                <?php else: ?>
+
+                    <div class="empty">
+                        Non sono ancora presenti valori ESG per questo bilancio.
+                    </div>
+
+                <?php endif; ?>
+
+            </div>
+
+        </div>
+
+    </main>
 
 </div>
 
 </body>
+
 </html>

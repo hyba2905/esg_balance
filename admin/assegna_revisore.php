@@ -15,7 +15,7 @@ if (
 $messaggio = "";
 
 /*
- * Recuperiamo i bilanci ancora in bozza.
+ * Recuperiamo i bilanci che possono ricevere revisori.
  */
 $bilanci = $connessione->query(
     "SELECT
@@ -25,7 +25,7 @@ $bilanci = $connessione->query(
      FROM Bilancio b
      INNER JOIN Azienda a
         ON b.id_azienda = a.id_azienda
-     WHERE b.stato = 'bozza'
+     WHERE b.stato IN ('bozza', 'in revisione')
      ORDER BY b.data_creazione DESC"
 );
 
@@ -89,159 +89,478 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Assegna revisore</title>
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
 
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f5;
             margin: 0;
-            padding: 40px 20px;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #eef2ed;
+            color: #2f332f;
         }
 
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: white;
-            padding: 35px 45px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        .layout {
+            display: flex;
+            min-height: 100vh;
         }
 
-        h1 {
-            text-align: center;
-            color: #333;
+        .sidebar {
+            width: 240px;
+            background: #9caf98;
+            padding: 35px 0 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .logo {
+            padding: 0 28px 35px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #263127;
+        }
+
+        .menu {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .menu a {
+            text-decoration: none;
+            color: #303830;
+            padding: 16px 28px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 15px;
+            transition: 0.2s;
+        }
+
+        .menu a:hover,
+        .menu a.active {
+            background: rgba(255, 255, 255, 0.22);
+            border-left: 4px solid #c9a64b;
+            padding-left: 24px;
+        }
+
+        .logout-area a {
+            text-decoration: none;
+            color: #303830;
+            padding: 16px 28px;
+            display: block;
+        }
+
+        .logout-area a:hover {
+            background: rgba(255, 255, 255, 0.22);
+        }
+
+        .main {
+            flex: 1;
+            padding: 30px 35px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .topbar h1 {
+            margin: 0;
+            font-size: 30px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: #536354;
+            font-weight: 600;
+        }
+
+        .page-grid {
+            display: grid;
+            grid-template-columns: 1fr 0.8fr;
+            gap: 22px;
+            align-items: start;
+        }
+
+        .panel {
+            background: #f7f9f5;
+            border-radius: 18px;
+            padding: 28px;
+            border: 1px solid #dfe6dc;
+            box-shadow: 0 5px 18px rgba(0,0,0,0.05);
+        }
+
+        .panel h2 {
             margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 22px;
         }
 
-        p {
-            color: #444;
+        .panel-description {
+            margin-top: 0;
+            margin-bottom: 24px;
+            color: #687168;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-top: 18px;
+            margin-bottom: 7px;
+            color: #424b42;
         }
 
         select {
             width: 100%;
-            box-sizing: border-box;
-            padding: 11px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            font-size: 15px;
+            padding: 12px 13px;
+            border: 1px solid #ccd5c8;
+            border-radius: 10px;
+            font-size: 14px;
+            background: white;
+            outline: none;
+        }
+
+        select:focus {
+            border-color: #9caf98;
+            box-shadow: 0 0 0 3px rgba(156,175,152,0.16);
         }
 
         button {
             width: 100%;
-            padding: 12px;
+            margin-top: 24px;
+            padding: 13px;
             border: none;
-            border-radius: 6px;
-            background-color: #35b98a;
-            color: white;
-            font-size: 16px;
+            border-radius: 10px;
+            background: #9caf98;
+            color: #263127;
+            font-size: 15px;
+            font-weight: 700;
             cursor: pointer;
+            transition: 0.2s;
         }
 
         button:hover {
-            background-color: #2da77b;
+            background: #899e86;
+            transform: translateY(-1px);
         }
 
         .messaggio {
-            text-align: center;
-            margin-bottom: 20px;
-            font-weight: bold;
+            background: #e2eadf;
+            border-left: 4px solid #a88b3f;
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-weight: 600;
+            margin-bottom: 18px;
         }
 
-        .indietro {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            color: #35a77e;
-            text-decoration: none;
+        .info-card {
+            background: #dfe7df;
+            border-radius: 16px;
+            padding: 22px;
         }
 
+        .info-card h3 {
+            margin-top: 0;
+            margin-bottom: 12px;
+        }
+
+        .info-card p {
+            margin: 0;
+            color: #5f685f;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .steps {
+            margin-top: 18px;
+            display: grid;
+            gap: 12px;
+        }
+
+        .step {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            min-width: 30px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #c9a64b;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .step-text {
+            color: #596259;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .empty-message {
+            background: #eee9d9;
+            border-radius: 10px;
+            padding: 15px;
+            color: #655a39;
+        }
+
+        @media (max-width: 950px) {
+            .page-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .sidebar {
+                width: 190px;
+            }
+
+            .main {
+                padding: 20px;
+            }
+        }
     </style>
-
 </head>
 
 <body>
 
-<div class="container">
+<div class="layout">
 
-    <h1>Assegna revisore</h1>
+    <aside class="sidebar">
 
-    <?php if ($messaggio !== ""): ?>
+        <div>
 
-        <p class="messaggio">
-            <?php echo htmlspecialchars($messaggio); ?>
-        </p>
+            <div class="logo">
+                ESG Balance
+            </div>
 
-    <?php endif; ?>
+            <nav class="menu">
 
-    <?php if ($bilanci->num_rows > 0 && $revisori->num_rows > 0): ?>
+                <a href="dashboard_admin.php">
+                    🏠 Dashboard
+                </a>
 
-        <form method="post">
+                <a href="indicatori.php">
+                    🌱 Indicatori ESG
+                </a>
 
-            <p>Bilancio</p>
+                <a href="template.php">
+                    📄 Template bilancio
+                </a>
 
-            <select name="id_bilancio" required>
+                <a href="assegna_revisore.php" class="active">
+                    👥 Assegna revisore
+                </a>
 
-                <option value="">
-                    Seleziona un bilancio
-                </option>
+                <a href="../statistiche.php">
+                    📊 Statistiche
+                </a>
 
-                <?php while ($bilancio = $bilanci->fetch_assoc()): ?>
+            </nav>
 
-                    <option value="<?php echo $bilancio["id_bilancio"]; ?>">
-                        Bilancio #<?php echo $bilancio["id_bilancio"]; ?>
-                        - <?php echo htmlspecialchars($bilancio["nome_azienda"]); ?>
-                    </option>
+        </div>
 
-                <?php endwhile; ?>
+        <div class="logout-area">
+            <a href="../logout.php">
+                ↪ Logout
+            </a>
+        </div>
 
-            </select>
+    </aside>
 
-            <p>Revisore ESG</p>
 
-            <select name="id_revisore" required>
+    <main class="main">
 
-                <option value="">
-                    Seleziona un revisore
-                </option>
+        <div class="topbar">
 
-                <?php while ($revisore = $revisori->fetch_assoc()): ?>
+            <h1>Assegna revisore</h1>
 
-                    <option value="<?php echo $revisore["id_revisore"]; ?>">
+            <a class="back-link" href="dashboard_admin.php">
+                ← Dashboard
+            </a>
 
-                        <?php echo htmlspecialchars($revisore["username"]); ?>
+        </div>
 
-                        - Revisioni:
-                        <?php echo $revisore["nr_revisioni"]; ?>
 
-                        - Affidabilità:
-                        <?php echo $revisore["indice_affidabilita"]; ?>
+        <div class="page-grid">
 
-                    </option>
+            <div class="panel">
 
-                <?php endwhile; ?>
+                <h2>Nuova assegnazione</h2>
 
-            </select>
+                <p class="panel-description">
+                    Seleziona un bilancio disponibile e il revisore ESG
+                    che vuoi associare alla revisione.
+                </p>
 
-            <button type="submit">
-                Assegna revisore
-            </button>
+                <?php if ($messaggio !== ""): ?>
 
-        </form>
+                    <div class="messaggio">
+                        <?php echo htmlspecialchars($messaggio); ?>
+                    </div>
 
-    <?php else: ?>
+                <?php endif; ?>
 
-        <p>
-            Non ci sono bilanci in bozza oppure revisori disponibili.
-        </p>
 
-    <?php endif; ?>
+                <?php if ($bilanci->num_rows > 0 && $revisori->num_rows > 0): ?>
 
-    <a class="indietro" href="dashboard_admin.php">
-        Torna alla dashboard
-    </a>
+                    <form method="post">
+
+                        <label for="id_bilancio">
+                            Bilancio
+                        </label>
+
+                        <select
+                            name="id_bilancio"
+                            id="id_bilancio"
+                            required
+                        >
+
+                            <option value="">
+                                Seleziona un bilancio
+                            </option>
+
+                            <?php while ($bilancio = $bilanci->fetch_assoc()): ?>
+
+                                <option value="<?php echo $bilancio["id_bilancio"]; ?>">
+
+                                    Bilancio #<?php echo $bilancio["id_bilancio"]; ?>
+                                    -
+                                    <?php echo htmlspecialchars($bilancio["nome_azienda"]); ?>
+
+                                </option>
+
+                            <?php endwhile; ?>
+
+                        </select>
+
+
+                        <label for="id_revisore">
+                            Revisore ESG
+                        </label>
+
+                        <select
+                            name="id_revisore"
+                            id="id_revisore"
+                            required
+                        >
+
+                            <option value="">
+                                Seleziona un revisore
+                            </option>
+
+                            <?php while ($revisore = $revisori->fetch_assoc()): ?>
+
+                                <option value="<?php echo $revisore["id_revisore"]; ?>">
+
+                                    <?php echo htmlspecialchars($revisore["username"]); ?>
+
+                                    -
+                                    Revisioni:
+                                    <?php echo $revisore["nr_revisioni"]; ?>
+
+                                    -
+                                    Affidabilità:
+                                    <?php echo $revisore["indice_affidabilita"]; ?>
+
+                                </option>
+
+                            <?php endwhile; ?>
+
+                        </select>
+
+
+                        <button type="submit">
+                            Assegna revisore
+                        </button>
+
+                    </form>
+
+                <?php else: ?>
+
+                    <div class="empty-message">
+                        Non ci sono bilanci disponibili oppure revisori ESG registrati.
+                    </div>
+
+                <?php endif; ?>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <h3>Come funziona</h3>
+
+                <p>
+                    L'amministratore può associare uno o più revisori ESG
+                    ai bilanci che devono essere controllati.
+                </p>
+
+                <div class="steps">
+
+                    <div class="step">
+
+                        <div class="step-number">
+                            1
+                        </div>
+
+                        <div class="step-text">
+                            Seleziona il bilancio da revisionare.
+                        </div>
+
+                    </div>
+
+
+                    <div class="step">
+
+                        <div class="step-number">
+                            2
+                        </div>
+
+                        <div class="step-text">
+                            Scegli il revisore ESG da associare.
+                        </div>
+
+                    </div>
+
+
+                    <div class="step">
+
+                        <div class="step-number">
+                            3
+                        </div>
+
+                        <div class="step-text">
+                            Dopo l'assegnazione il bilancio passa
+                            automaticamente allo stato
+                            <strong>in revisione</strong>.
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
 
 </div>
 

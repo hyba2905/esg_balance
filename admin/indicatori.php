@@ -112,315 +112,498 @@ $indicatori = $connessione->query(
 <html lang="it">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indicatori ESG</title>
 
-<meta charset="UTF-8">
-<title>Indicatori ESG</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
 
-<style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #eef2ed;
+            color: #2f332f;
+        }
 
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f6f5;
-    margin: 0;
-    padding: 40px 20px;
-}
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
 
-.container {
-    max-width: 850px;
-    margin: 0 auto;
-}
+        .sidebar {
+            width: 240px;
+            background: #9caf98;
+            padding: 35px 0 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
 
-.box {
-    background: white;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    margin-bottom: 25px;
-}
+        .logo {
+            padding: 0 28px 35px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #263127;
+        }
 
-h1 {
-    color: #333;
-}
+        .menu {
+            display: flex;
+            flex-direction: column;
+        }
 
-.indicatore {
-    padding: 15px 0;
-    border-bottom: 1px solid #eee;
-}
+        .menu a {
+            text-decoration: none;
+            color: #303830;
+            padding: 16px 28px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 15px;
+            transition: 0.2s;
+        }
 
-.indicatore:last-child {
-    border-bottom: none;
-}
+        .menu a:hover,
+        .menu a.active {
+            background: rgba(255, 255, 255, 0.22);
+            border-left: 4px solid #c9a64b;
+            padding-left: 24px;
+        }
 
-.indicatore h3 {
-    margin: 0 0 8px 0;
-}
+        .logout-area a {
+            text-decoration: none;
+            color: #303830;
+            padding: 16px 28px;
+            display: block;
+        }
 
-label {
-    display: block;
-    font-weight: bold;
-    margin-top: 15px;
-    margin-bottom: 6px;
-}
+        .logout-area a:hover {
+            background: rgba(255, 255, 255, 0.22);
+        }
 
-input,
-select {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 11px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 15px;
-}
+        .main {
+            flex: 1;
+            padding: 30px 35px;
+        }
 
-button {
-    width: 100%;
-    margin-top: 20px;
-    padding: 12px;
-    border: none;
-    border-radius: 6px;
-    background-color: #35b98a;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-}
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
 
-button:hover {
-    background-color: #2da77b;
-}
+        .topbar h1 {
+            margin: 0;
+            font-size: 30px;
+        }
 
-.messaggio {
-    font-weight: bold;
-    margin-bottom: 20px;
-}
+        .back-link {
+            text-decoration: none;
+            color: #536354;
+            font-weight: 600;
+        }
 
-.campo-specifico {
-    display: none;
-}
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 22px;
+            align-items: start;
+        }
 
-.indietro {
-    display: block;
-    text-align: center;
-    margin-top: 20px;
-    color: #35a77e;
-    text-decoration: none;
-}
+        .panel {
+            background: #f7f9f5;
+            border-radius: 18px;
+            padding: 25px;
+            border: 1px solid #dfe6dc;
+            box-shadow: 0 5px 18px rgba(0,0,0,0.05);
+        }
 
-</style>
+        .panel h2 {
+            margin-top: 0;
+            font-size: 21px;
+        }
 
+        .indicatore {
+            background: #e3e9e0;
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 14px;
+        }
+
+        .indicatore:last-child {
+            margin-bottom: 0;
+        }
+
+        .indicatore h3 {
+            margin: 0 0 10px;
+            font-size: 17px;
+        }
+
+        .indicatore p {
+            margin: 6px 0;
+            color: #5c655c;
+            font-size: 14px;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .tag.ambientale {
+            background: #d7e5d4;
+            color: #466047;
+        }
+
+        .tag.sociale {
+            background: #eadfbd;
+            color: #705f2f;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-top: 15px;
+            margin-bottom: 6px;
+            color: #424b42;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px 13px;
+            border: 1px solid #ccd5c8;
+            border-radius: 10px;
+            font-size: 14px;
+            background: white;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #9caf98;
+            box-shadow: 0 0 0 3px rgba(156,175,152,0.16);
+        }
+
+        button {
+            width: 100%;
+            margin-top: 22px;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: #9caf98;
+            color: #263127;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #899e86;
+            transform: translateY(-1px);
+        }
+
+        .messaggio {
+            background: #e2eadf;
+            border-left: 4px solid #a88b3f;
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .campo-specifico {
+            display: none;
+        }
+
+        @media (max-width: 950px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .sidebar {
+                width: 190px;
+            }
+
+            .main {
+                padding: 20px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="layout">
 
-    <h1>Indicatori ESG</h1>
+    <aside class="sidebar">
 
+        <div>
 
-    <div class="box">
+            <div class="logo">
+                ESG Balance
+            </div>
 
-        <h2>Indicatori presenti</h2>
+            <nav class="menu">
 
-        <?php if ($indicatori && $indicatori->num_rows > 0): ?>
+                <a href="dashboard_admin.php">
+                    🏠 Dashboard
+                </a>
 
-            <?php while ($indicatore = $indicatori->fetch_assoc()): ?>
+                <a href="indicatori.php" class="active">
+                    🌱 Indicatori ESG
+                </a>
 
-                <div class="indicatore">
+                <a href="template.php">
+                    📄 Template bilancio
+                </a>
 
-                    <h3>
-                        <?php echo htmlspecialchars($indicatore["nome"]); ?>
-                    </h3>
+                <a href="assegna_revisore.php">
+                    👥 Assegna revisore
+                </a>
 
-                    <p>
-                        <strong>Tipo:</strong>
-                        <?php echo htmlspecialchars($indicatore["tipo"]); ?>
-                    </p>
+                <a href="../statistiche.php">
+                    📊 Statistiche
+                </a>
 
-                    <p>
-                        <strong>Rilevanza:</strong>
-                        <?php echo htmlspecialchars($indicatore["rilevanza"]); ?>
-                    </p>
+            </nav>
 
-                    <?php if ($indicatore["tipo"] === "ambientale"): ?>
+        </div>
 
-                        <p>
-                            <strong>Codice normativa:</strong>
-                            <?php echo htmlspecialchars(
-                                $indicatore["codice_normativa"] ?? ""
-                            ); ?>
-                        </p>
+        <div class="logout-area">
+            <a href="../logout.php">
+                ↪ Logout
+            </a>
+        </div>
 
-                    <?php else: ?>
-
-                        <p>
-                            <strong>Ambito sociale:</strong>
-                            <?php echo htmlspecialchars(
-                                $indicatore["ambito_sociale"] ?? ""
-                            ); ?>
-                        </p>
-
-                        <p>
-                            <strong>Frequenza rilevazione:</strong>
-                            <?php echo htmlspecialchars(
-                                $indicatore["frequenza_rilevazione"] ?? ""
-                            ); ?>
-                        </p>
-
-                    <?php endif; ?>
-
-                </div>
-
-            <?php endwhile; ?>
-
-        <?php else: ?>
-
-            <p>Nessun indicatore presente.</p>
-
-        <?php endif; ?>
-
-    </div>
+    </aside>
 
 
-    <div class="box">
+    <main class="main">
 
-        <h2>Aggiungi indicatore ESG</h2>
+        <div class="topbar">
 
-        <?php if ($messaggio !== ""): ?>
+            <h1>Indicatori ESG</h1>
 
-            <p class="messaggio">
-                <?php echo htmlspecialchars($messaggio); ?>
-            </p>
+            <a class="back-link" href="dashboard_admin.php">
+                ← Dashboard
+            </a>
 
-        <?php endif; ?>
-
-
-        <form method="post">
-
-            <label for="nome">
-                Nome
-            </label>
-
-            <input
-                type="text"
-                name="nome"
-                id="nome"
-                required
-            >
+        </div>
 
 
-            <label for="immagine">
-                Immagine
-            </label>
+        <div class="content-grid">
 
-            <input
-                type="text"
-                name="immagine"
-                id="immagine"
-                placeholder="es. energia.png"
-            >
+            <div class="panel">
 
+                <h2>Indicatori presenti</h2>
 
-            <label for="rilevanza">
-                Rilevanza
-            </label>
+                <?php if ($indicatori && $indicatori->num_rows > 0): ?>
 
-            <input
-                type="number"
-                name="rilevanza"
-                id="rilevanza"
-                required
-            >
+                    <?php while ($indicatore = $indicatori->fetch_assoc()): ?>
 
+                        <div class="indicatore">
 
-            <label for="tipo">
-                Tipo
-            </label>
+                            <span class="tag <?php echo htmlspecialchars($indicatore["tipo"]); ?>">
+                                <?php echo ucfirst(htmlspecialchars($indicatore["tipo"])); ?>
+                            </span>
 
-            <select
-                name="tipo"
-                id="tipo"
-                required
-                onchange="aggiornaCampi()"
-            >
+                            <h3>
+                                <?php echo htmlspecialchars($indicatore["nome"]); ?>
+                            </h3>
 
-                <option value="">
-                    Seleziona il tipo
-                </option>
+                            <p>
+                                <strong>Rilevanza:</strong>
+                                <?php echo htmlspecialchars($indicatore["rilevanza"]); ?>
+                            </p>
 
-                <option value="ambientale">
-                    Ambientale
-                </option>
+                            <?php if ($indicatore["tipo"] === "ambientale"): ?>
 
-                <option value="sociale">
-                    Sociale
-                </option>
+                                <p>
+                                    <strong>Codice normativa:</strong>
+                                    <?php echo htmlspecialchars(
+                                        $indicatore["codice_normativa"] ?? ""
+                                    ); ?>
+                                </p>
 
-            </select>
+                            <?php else: ?>
 
+                                <p>
+                                    <strong>Ambito sociale:</strong>
+                                    <?php echo htmlspecialchars(
+                                        $indicatore["ambito_sociale"] ?? ""
+                                    ); ?>
+                                </p>
 
-            <div
-                id="campoAmbientale"
-                class="campo-specifico"
-            >
+                                <p>
+                                    <strong>Frequenza rilevazione:</strong>
+                                    <?php echo htmlspecialchars(
+                                        $indicatore["frequenza_rilevazione"] ?? ""
+                                    ); ?>
+                                </p>
 
-                <label for="codice_normativa">
-                    Codice normativa
-                </label>
+                            <?php endif; ?>
 
-                <input
-                    type="text"
-                    name="codice_normativa"
-                    id="codice_normativa"
-                    placeholder="es. ISO 14001"
-                >
+                        </div>
+
+                    <?php endwhile; ?>
+
+                <?php else: ?>
+
+                    <p>Nessun indicatore presente.</p>
+
+                <?php endif; ?>
 
             </div>
 
 
-            <div
-                id="campoSociale"
-                class="campo-specifico"
-            >
+            <div class="panel">
 
-                <label for="ambito_sociale">
-                    Ambito sociale
-                </label>
+                <h2>Aggiungi indicatore ESG</h2>
 
-                <input
-                    type="text"
-                    name="ambito_sociale"
-                    id="ambito_sociale"
-                >
+                <?php if ($messaggio !== ""): ?>
+
+                    <div class="messaggio">
+                        <?php echo htmlspecialchars($messaggio); ?>
+                    </div>
+
+                <?php endif; ?>
 
 
-                <label for="frequenza_rilevazione">
-                    Frequenza rilevazione
-                </label>
+                <form method="post">
 
-                <input
-                    type="text"
-                    name="frequenza_rilevazione"
-                    id="frequenza_rilevazione"
-                    placeholder="es. annuale"
-                >
+                    <label for="nome">
+                        Nome
+                    </label>
+
+                    <input
+                        type="text"
+                        name="nome"
+                        id="nome"
+                        required
+                    >
+
+
+                    <label for="immagine">
+                        Immagine
+                    </label>
+
+                    <input
+                        type="text"
+                        name="immagine"
+                        id="immagine"
+                        placeholder="es. energia.png"
+                    >
+
+
+                    <label for="rilevanza">
+                        Rilevanza
+                    </label>
+
+                    <input
+                        type="number"
+                        name="rilevanza"
+                        id="rilevanza"
+                        required
+                    >
+
+
+                    <label for="tipo">
+                        Tipo
+                    </label>
+
+                    <select
+                        name="tipo"
+                        id="tipo"
+                        required
+                        onchange="aggiornaCampi()"
+                    >
+
+                        <option value="">
+                            Seleziona il tipo
+                        </option>
+
+                        <option value="ambientale">
+                            Ambientale
+                        </option>
+
+                        <option value="sociale">
+                            Sociale
+                        </option>
+
+                    </select>
+
+
+                    <div
+                        id="campoAmbientale"
+                        class="campo-specifico"
+                    >
+
+                        <label for="codice_normativa">
+                            Codice normativa
+                        </label>
+
+                        <input
+                            type="text"
+                            name="codice_normativa"
+                            id="codice_normativa"
+                            placeholder="es. ISO 14001"
+                        >
+
+                    </div>
+
+
+                    <div
+                        id="campoSociale"
+                        class="campo-specifico"
+                    >
+
+                        <label for="ambito_sociale">
+                            Ambito sociale
+                        </label>
+
+                        <input
+                            type="text"
+                            name="ambito_sociale"
+                            id="ambito_sociale"
+                        >
+
+
+                        <label for="frequenza_rilevazione">
+                            Frequenza rilevazione
+                        </label>
+
+                        <input
+                            type="text"
+                            name="frequenza_rilevazione"
+                            id="frequenza_rilevazione"
+                            placeholder="es. annuale"
+                        >
+
+                    </div>
+
+
+                    <button type="submit">
+                        Aggiungi indicatore
+                    </button>
+
+                </form>
 
             </div>
 
+        </div>
 
-            <button type="submit">
-                Aggiungi indicatore
-            </button>
-
-        </form>
-
-    </div>
-
-
-    <a
-        class="indietro"
-        href="dashboard_admin.php"
-    >
-        Torna alla dashboard
-    </a>
+    </main>
 
 </div>
 
@@ -475,6 +658,7 @@ function aggiornaCampi() {
 
         ambientale.style.display = "none";
         sociale.style.display = "none";
+
     }
 }
 

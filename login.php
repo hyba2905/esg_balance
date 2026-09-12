@@ -81,108 +81,342 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 ?>
 
-<style>
+<!DOCTYPE html>
+<html lang="it">
 
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f6f5;
-        margin: 0;
-        padding: 40px 20px;
-    }
+<head>
 
-    .login-container {
-        max-width: 450px;
-        margin: 80px auto;
-        background: white;
-        padding: 35px 45px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    h1 {
-        text-align: center;
-        color: #333;
-        margin-top: 0;
-        margin-bottom: 30px;
-    }
+    <title>Login - ESG Balance</title>
 
-    form p {
-        margin-bottom: 7px;
-        color: #444;
-    }
+    <style>
 
-    input {
-        width: 100%;
-        box-sizing: border-box;
-        padding: 11px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        font-size: 15px;
-        margin-bottom: 15px;
-    }
+        * {
+            box-sizing: border-box;
+        }
 
-    input:focus {
-        outline: none;
-        border-color: #35b98a;
-    }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #eef2ed;
+            color: #2f332f;
+        }
 
-    button {
-        width: 100%;
-        padding: 12px;
-        background-color: #35b98a;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        font-size: 16px;
-        cursor: pointer;
-    }
+        .page {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1.05fr 0.95fr;
+        }
 
-    button:hover {
-        background-color: #2da77b;
-    }
+        /* PARTE SINISTRA */
 
-    .messaggio {
-        text-align: center;
-        margin-bottom: 20px;
-        color: #c0392b;
-    }
+        .brand-side {
+            background: #9caf98;
+            padding: 60px 70px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
 
-    .torna-home {
-        display: block;
-        text-align: center;
-        margin-top: 20px;
-        color: #35a77e;
-        text-decoration: none;
-    }
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 25px;
+            font-weight: 700;
+            color: #263127;
+        }
 
-</style>
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 13px;
+            background: rgba(255,255,255,0.28);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 21px;
+        }
 
-<div class="login-container">
+        .brand-content {
+            max-width: 520px;
+        }
 
-    <h1>Login</h1>
+        .brand-content h1 {
+            margin: 0 0 20px;
+            font-size: 52px;
+            line-height: 1.08;
+            color: #263127;
+        }
 
-    <?php if ($messaggio !== "") { ?>
-        <p class="messaggio">
-            <?php echo htmlspecialchars($messaggio); ?>
-        </p>
-    <?php } ?>
+        .brand-content p {
+            margin: 0;
+            color: #3f4c40;
+            line-height: 1.7;
+            font-size: 17px;
+        }
 
-    <form method="post">
+        .brand-footer {
+            color: #465447;
+            font-size: 13px;
+        }
 
-        <p>Email</p>
-        <input type="email" name="email" required>
+        /* PARTE DESTRA */
 
-        <p>Password</p>
-        <input type="password" name="password" required>
+        .login-side {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 50px 30px;
+        }
 
-        <br>
+        .login-box {
+            width: 100%;
+            max-width: 450px;
+        }
 
-        <button type="submit">Accedi</button>
+        .login-box h2 {
+            margin: 0 0 8px;
+            font-size: 31px;
+            color: #303830;
+        }
 
-    </form>
+        .subtitle {
+            margin: 0 0 30px;
+            color: #6d766d;
+            line-height: 1.6;
+        }
 
-    <a class="torna-home" href="index.php">
-        Torna alla Home
-    </a>
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #414a41;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px 14px;
+            margin-bottom: 19px;
+            border: 1px solid #ccd5c8;
+            border-radius: 10px;
+            background: #f9fbf8;
+            font-size: 15px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            border-color: #9caf98;
+            box-shadow: 0 0 0 3px rgba(156,175,152,0.16);
+            background: white;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 10px;
+            background: #c9a64b;
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .login-button:hover {
+            background: #b4923e;
+            transform: translateY(-1px);
+        }
+
+        .messaggio {
+            margin-bottom: 20px;
+            padding: 12px 14px;
+            border-radius: 9px;
+            background: #edd8d5;
+            color: #804c46;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .register-text {
+            text-align: center;
+            margin-top: 24px;
+            color: #6b746b;
+            font-size: 14px;
+        }
+
+        .register-text a {
+            color: #7a6937;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .register-text a:hover {
+            text-decoration: underline;
+        }
+
+        .back-home {
+            display: inline-block;
+            margin-top: 25px;
+            text-decoration: none;
+            color: #536354;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 900px) {
+
+            .page {
+                grid-template-columns: 1fr;
+            }
+
+            .brand-side {
+                min-height: 300px;
+                padding: 35px 30px;
+            }
+
+            .brand-content h1 {
+                font-size: 38px;
+            }
+
+            .brand-footer {
+                display: none;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="page">
+
+    <section class="brand-side">
+
+        <div class="brand-logo">
+
+            <div class="brand-icon">
+                🌿
+            </div>
+
+            ESG Balance
+
+        </div>
+
+
+        <div class="brand-content">
+
+            <h1>
+                Gestisci i tuoi bilanci in modo sostenibile.
+            </h1>
+
+            <p>
+                Accedi alla piattaforma per gestire aziende,
+                bilanci, indicatori ESG e revisioni in base
+                al tuo ruolo.
+            </p>
+
+        </div>
+
+
+        <div class="brand-footer">
+            ESG Balance · Gestione e revisione dei bilanci ESG
+        </div>
+
+    </section>
+
+
+    <section class="login-side">
+
+        <div class="login-box">
+
+            <h2>Bentornato</h2>
+
+            <p class="subtitle">
+                Inserisci le tue credenziali per accedere
+                alla piattaforma.
+            </p>
+
+
+            <?php if ($messaggio !== ""): ?>
+
+                <div class="messaggio">
+                    <?php echo htmlspecialchars($messaggio); ?>
+                </div>
+
+            <?php endif; ?>
+
+
+            <form method="post">
+
+                <label for="email">
+                    Email
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="nome@email.it"
+                    required
+                >
+
+
+                <label for="password">
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Inserisci la password"
+                    required
+                >
+
+
+                <button
+                    type="submit"
+                    class="login-button"
+                >
+                    Accedi
+                </button>
+
+            </form>
+
+
+            <div class="register-text">
+
+                Non hai ancora un account?
+
+                <a href="registrazione.php">
+                    Registrati
+                </a>
+
+            </div>
+
+
+            <a
+                class="back-home"
+                href="index.php"
+            >
+                ← Torna alla Home
+            </a>
+
+        </div>
+
+    </section>
 
 </div>
+
+</body>
+
+</html>
